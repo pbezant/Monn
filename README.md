@@ -3,9 +3,11 @@
 This repository contains a trading bot that utilizes the MetaTrader5 API for automated trading in the financial markets. The bot is designed to execute trades based on pre-defined strategies and market conditions.
 
 ## Table of Contents
-- [Features](features)
-- [Prerequisites](prerequisites)
+- [Features](#features)
+- [Prerequisites](#prerequisites)
 - [Installation](#installation)
+  - [Local Installation](#local-installation)
+  - [Proxmox VM Deployment](#proxmox-vm-deployment)
 - [Configuration](#configuration)
 - [Usage](#usage)
 - [Disclaimer](#disclaimer)
@@ -24,13 +26,70 @@ This repository contains a trading bot that utilizes the MetaTrader5 API for aut
   - Basic knowledge of trading concepts and strategies
 
 ## Installation
+
+### Local Installation
   1. Clone the repository to your local machine:
      ```bash
      git clone https://github.com/Zsunflower/MetaTrader5-auto-trading-bot
+     ```
   2. Install the required dependencies:
      ```bash
      pip install -r requirements.txt
+     ```
   3. Install the TA-Lib library by following the installation guide provided on the [TA-Lib GitHub repository](https://github.com/TA-Lib/ta-lib-python).
+
+### Proxmox VM Deployment
+
+Deploy this trading bot on a Proxmox Windows VM with full automation:
+
+#### Quick Deploy (One-Line Installation)
+
+On your Proxmox host, run:
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/pbezant/Monn/main/proxmox-vm-deploy.sh)"
+```
+
+This script will:
+- Create a Windows 11 VM with optimal settings
+- Configure VirtIO drivers for best performance
+- Set up networking and storage
+- Provide a Windows setup script for post-installation
+
+#### After Windows Installation
+
+Once Windows is installed on the VM, run the automated setup script in PowerShell (as Administrator):
+
+```powershell
+# Download and run the setup script
+Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/pbezant/Monn/main/windows-setup.ps1' -OutFile setup.ps1
+Set-ExecutionPolicy Bypass -Scope Process -Force
+.\setup.ps1
+```
+
+The Windows setup script automatically:
+- Installs Python 3.11 and Git
+- Clones this repository
+- Installs all Python dependencies including TA-Lib
+- Sets up logging directories
+- Creates a Windows service installation script
+
+#### Manual Proxmox Setup
+
+If you prefer manual setup:
+
+1. **Create Windows VM** with these specs:
+   - OS: Windows 10/11 Pro
+   - CPU: 2+ cores (host CPU type)
+   - RAM: 4GB minimum
+   - Disk: 60GB (VirtIO SCSI)
+   - Network: VirtIO adapter
+   - Enable QEMU Guest Agent
+
+2. **After Windows installation**, follow the [Local Installation](#local-installation) steps above.
+
+For detailed deployment architecture and agent information, see [DEPLOYMENT_AGENTS.md](DEPLOYMENT_AGENTS.md).
+
+
 ## Configuration
   1. Log in to your MetaTrader 5 account using the MetaTrader 5 platform.
   2. Edit the 'configs/exchange_config.json' file and update the following:
