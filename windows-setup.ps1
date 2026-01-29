@@ -151,8 +151,8 @@ function Install-TALib {
     # Get Python version
     $pythonVersion = python -c "import sys; print(f'{sys.version_info.major}{sys.version_info.minor}')"
     
-    # Download pre-built wheel
-    $taLibUrl = "https://github.com/cgohlke/talib-build/releases/download/v0.4.28/TA_Lib-0.4.28-cp${pythonVersion}-cp${pythonVersion}-win_amd64.whl"
+    # Download pre-built wheel (match requirements.txt)
+    $taLibUrl = "https://github.com/cgohlke/talib-build/releases/download/v0.4.19/TA_Lib-0.4.19-cp${pythonVersion}-cp${pythonVersion}-win_amd64.whl"
     $taLibFile = "talib.whl"
     
     Write-Info "Downloading TA-Lib wheel for Python $pythonVersion..."

@@ -73,6 +73,18 @@ The Windows setup script automatically:
 - Sets up logging directories
 - Creates a Windows service installation script
 
+#### Windows Install (One-Time Checklist)
+
+1. Boot the VM from the Windows ISO.
+2. When asked **Where do you want to install Windows?** and no disks appear:
+  - Click **Load driver**
+  - Browse the VirtIO CD (usually `D:`)
+  - Select: `vioscsi\w10\amd64`
+  - Click **Next** to load the driver
+3. The disk will appear. Select it and continue the installation.
+4. After installation completes, remove the Windows ISO (optional) and reboot.
+5. Run the Windows setup script from this repo (see above).
+
 #### Manual Proxmox Setup
 
 If you prefer manual setup:

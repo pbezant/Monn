@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Monn Trading Bot - Proxmox Windows VM Automated Deployment
-# Usage: bash -c "$(curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/Monn/main/proxmox-vm-deploy.sh)"
+# Usage: bash -c "$(curl -fsSL https://raw.githubusercontent.com/pbezant/Monn/main/proxmox-vm-deploy.sh)"
 
 set -e
 
@@ -26,6 +26,14 @@ VIRTIO_ISO="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/sta
 NETWORK_BRIDGE="vmbr0"
 GITHUB_REPO="pbezant/Monn"
 GITHUB_BRANCH="main"
+
+normalize_disk_size() {
+    # Accepts sizes like "60G" or "60" and returns a number for Proxmox
+    local size="$1"
+    size="${size%G}"
+    size="${size%g}"
+    echo "$size"
+}
 
 # Helper functions
 print_header() {
@@ -184,17 +192,17 @@ create_vm() {
     
     # Add EFI disk
     print_info "Adding EFI disk..."
-    pvesm alloc ${VM_STORAGE} ${VM_ID} vm-${VM_ID}-efi 1M || true
-    qm set ${VM_ID} --efidisk0 ${VM_STORAGE}:vm-${VM_ID}-disk-0,efitype=4m,pre-enrolled-keys=0
+    qm set ${VM_ID} --efidisk0 ${VM_STORAGE}:1,efitype=4m,pre-enrolled-keys=0
     
     # Add main disk
     print_info "Adding main disk (${VM_DISK_SIZE})..."
-    qm set ${VM_ID} --scsi0 ${VM_STORAGE}:${VM_DISK_SIZE},iothread=1,cache=writeback,discard=on
+    local disk_size
+    disk_size=$(normalize_disk_size "${VM_DISK_SIZE}")
+    qm set ${VM_ID} --scsi0 ${VM_STORAGE}:${disk_size},iothread=1,cache=writeback,discard=on
     
     # Add TPM (for Windows 11)
     print_info "Adding TPM state..."
-    pvesm alloc ${VM_STORAGE} ${VM_ID} vm-${VM_ID}-tpm 4M || true
-    qm set ${VM_ID} --tpmstate0 ${VM_STORAGE}:vm-${VM_ID}-disk-1,version=v2.0
+    qm set ${VM_ID} --tpmstate0 ${VM_STORAGE}:1,version=v2.0
     
     # Add CD-ROM drives
     if [[ -n "$WINDOWS_ISO" ]]; then
@@ -205,8 +213,8 @@ create_vm() {
     print_info "Attaching VirtIO drivers ISO..."
     qm set ${VM_ID} --ide2 ${ISO_STORAGE}:iso/virtio-win.iso,media=cdrom
     
-    # Boot order
-    qm set ${VM_ID} --boot order=scsi0
+    # Boot order (Windows ISO first)
+    qm set ${VM_ID} --boot order=ide0;scsi0;net0
     
     print_success "VM ${VM_ID} configured successfully"
 }
@@ -294,6 +302,7 @@ print_instructions() {
     echo "  1. Start the VM: ${GREEN}qm start ${VM_ID}${NC}"
     echo "  2. Open the VM console: ${GREEN}Access via Proxmox web UI${NC}"
     echo "  3. Install Windows (use VirtIO drivers from the second CD)"
+    echo "     - When disks are missing: Load driver -> vioscsi\\w10\\amd64"
     echo "  4. After Windows installation, download and run the setup script:"
     echo "     ${YELLOW}Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/${GITHUB_REPO}/${GITHUB_BRANCH}/windows-setup.ps1' -OutFile setup.ps1${NC}"
     echo "     ${YELLOW}powershell -ExecutionPolicy Bypass -File setup.ps1${NC}"
