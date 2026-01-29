@@ -83,7 +83,13 @@ The Windows setup script automatically:
   - Click **Next** to load the driver
 3. The disk will appear. Select it and continue the installation.
 4. After installation completes, remove the Windows ISO (optional) and reboot.
-5. Run the Windows setup script from this repo (see above).
+5. If Windows has **no network access**, install the VirtIO **network driver**:
+  - Open **Device Manager** → right-click **Ethernet Controller** → **Update driver**
+  - Browse the VirtIO CD (usually `D:`)
+  - Select: `NetKVM\\w10\\amd64`
+  - Click **Next** to install
+6. (Recommended) Run `D:\\virtio-win-guest-tools.exe` to install all VirtIO tools.
+7. Run the Windows setup script from this repo (see above).
 
 #### Manual Proxmox Setup
 
