@@ -2,8 +2,12 @@
 
 # Monn Trading Bot - Proxmox Windows VM Automated Deployment
 # Usage: bash -c "$(curl -fsSL https://raw.githubusercontent.com/pbezant/Monn/main/proxmox-vm-deploy.sh)"
+# Or with ISO path: bash script.sh /path/to/Win10.iso
 
 set -e
+
+# Accept ISO path as first argument
+WINDOWS_ISO_PATH="${1:-}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -119,10 +123,16 @@ prompt_user() {
     # Windows ISO
     print_info "Available ISOs:"
     pvesm list $ISO_STORAGE --content iso 2>/dev/null | grep -i ".iso" | awk '{print "  - " $1}' || echo "  No ISOs found"
-    read -p "Enter Windows ISO filename (e.g., Win11_English_x64.iso): " WINDOWS_ISO
     
-    if [[ -z "$WINDOWS_ISO" ]]; then
-        print_warning "No Windows ISO specified. You'll need to add it manually later."
+    # If ISO path provided, skip asking
+    if [[ -n "$WINDOWS_ISO_PATH" ]]; then
+        print_success "Using Windows ISO from: $WINDOWS_ISO_PATH"
+    else
+        read -p "Enter Windows ISO filename (e.g., Win11_English_x64.iso): " WINDOWS_ISO
+        
+        if [[ -z "$WINDOWS_ISO" ]]; then
+            print_warning "No Windows ISO specified. You'll need to add it manually later."
+        fi
     fi
     
     # Network Bridge
@@ -169,6 +179,40 @@ download_virtio_iso() {
     }
     
     print_success "VirtIO ISO downloaded"
+}
+
+upload_windows_iso() {
+    if [[ -z "$WINDOWS_ISO_PATH" ]]; then
+        print_warning "No Windows ISO path provided. Skipping upload."
+        return 0
+    fi
+    
+    if [[ ! -f "$WINDOWS_ISO_PATH" ]]; then
+        print_error "Windows ISO file not found: $WINDOWS_ISO_PATH"
+        exit 1
+    fi
+    
+    local iso_filename=$(basename "$WINDOWS_ISO_PATH")
+    local remote_iso_path="/var/lib/vz/template/iso/$iso_filename"
+    
+    # Check if already exists
+    if ssh root@$(hostname -I | awk '{print $1}') "test -f $remote_iso_path" 2>/dev/null; then
+        print_success "Windows ISO already on Proxmox: $iso_filename"
+        WINDOWS_ISO="$iso_filename"
+        return 0
+    fi
+    
+    print_info "Uploading Windows ISO to Proxmox ($iso_filename)..."
+    print_warning "This may take several minutes..."
+    
+    # Use scp to upload (runs on Proxmox host)
+    scp -p "$WINDOWS_ISO_PATH" "root@$(hostname -I | awk '{print $1}'):$remote_iso_path" || {
+        print_error "Failed to upload Windows ISO"
+        exit 1
+    }
+    
+    print_success "Windows ISO uploaded: $iso_filename"
+    WINDOWS_ISO="$iso_filename"
 }
 
 create_vm() {
@@ -330,6 +374,12 @@ main() {
     print_header
     check_root
     check_proxmox
+    
+    # Upload ISO if provided
+    if [[ -n "$WINDOWS_ISO_PATH" ]]; then
+        upload_windows_iso
+    fi
+    
     prompt_user
     download_virtio_iso
     create_vm
