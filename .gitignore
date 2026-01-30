@@ -133,3 +133,5 @@ Draft.ipynb
 test_symbol_trading_config.json
 ReportTuning.ipynb
 *.iso
+# Sensitive config files with credentials
+configs/exchange_config.json
