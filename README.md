@@ -57,21 +57,33 @@ This script will:
 
 #### After Windows Installation
 
-Once Windows is installed on the VM, run the automated setup script in PowerShell (as Administrator):
+Once Windows is installed on the VM, run the **automated quick-setup script** in PowerShell (as Administrator):
 
 ```powershell
-# Download and run the setup script
-Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/pbezant/Monn/main/windows-setup.ps1' -OutFile setup.ps1
+# One-line installation - Run this in PowerShell as Administrator
+iex (irm 'https://raw.githubusercontent.com/pbezant/Monn/main/quick-setup.ps1')
+```
+
+**Alternative:** Download and run manually:
+```powershell
+Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/pbezant/Monn/main/quick-setup.ps1' -OutFile setup.ps1
 Set-ExecutionPolicy Bypass -Scope Process -Force
 .\setup.ps1
 ```
 
-The Windows setup script automatically:
-- Installs Python 3.11 and Git
-- Clones this repository
-- Installs all Python dependencies including TA-Lib
-- Sets up logging directories
-- Creates a Windows service installation script
+The automated setup script will:
+- ✅ Install Chocolatey, Python 3.11, Git, Visual Studio Build Tools
+- ✅ Install OpenSSH Server for remote access
+- ✅ Clone this repository to `C:\Users\YourName\Developement\Monn`
+- ✅ Install all Python dependencies including TA-Lib
+- ✅ Install MetaTrader 5
+- ✅ Create desktop shortcuts: "Start Monn Trading Bot" & "Stop Monn Trading Bot"
+- ✅ Set up logging and config directories
+
+**After setup completes:**
+1. Open MetaTrader 5 → File → Open an Account → Create demo account
+2. Edit `C:\Users\YourName\Developement\Monn\configs\exchange_config.json` with your MT5 credentials
+3. Double-click "Start Monn Trading Bot" on your desktop!
 
 #### Windows Install (One-Time Checklist)
 
