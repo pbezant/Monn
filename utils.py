@@ -87,6 +87,11 @@ def get_line_coffs(a, c):
 def parse_line_coffs(points):
     x0 = points[0][0]
     xn = points[-1][0]
+    
+    # Avoid division by zero when all points have the same x-coordinate
+    if xn == x0:
+        return None, None
+    
     X = [
         [
             (point[0] - x0) / (xn - x0),
@@ -111,6 +116,8 @@ def find_uptrend_line(poke_points):
     # return: ((x0d, y0d), (xnd, ynd))
 
     X, Y = parse_line_coffs(poke_points)
+    if X is None or Y is None:
+        return None
     obj = [-X[:, 0].sum(), -X[:, 1].sum()]
     lhs_ineq = X
     rhs_ineq = Y
@@ -130,6 +137,8 @@ def find_downtrend_line(peak_points):
     # return: ((x0u, y0u), (xnu, ynu))
 
     X, Y = parse_line_coffs(peak_points)
+    if X is None or Y is None:
+        return None
     obj = [X[:, 0].sum(), X[:, 1].sum()]
     lhs_ineq = -X
     rhs_ineq = -Y

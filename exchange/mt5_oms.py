@@ -9,7 +9,7 @@ bot_logger = logging.getLogger("bot_logger")
 
 
 class MT5OrderTemplate:
-    def __init__(self, symbol, volume, entry, tp, sl, order_side: OrderSide, order_type: OrderType):
+    def __init__(self, symbol, volume, entry, tp, sl, order_side: OrderSide, order_type: OrderType, filling_mode):
         self.symbol = symbol
         self.volume = volume
         self.price = entry
@@ -17,12 +17,13 @@ class MT5OrderTemplate:
         self.sl = sl
         self.order_type = order_type
         self.order_side = order_side
+        self.filling_mode = filling_mode
 
     def get_main_order(self):
         params = {
             "symbol": self.symbol,
             "volume": self.volume,
-            "type_filling": mt5.ORDER_FILLING_IOC,
+            "type_filling": self.filling_mode,
             "type_time": mt5.ORDER_TIME_GTC,
         }
         if self.tp:
@@ -47,7 +48,7 @@ class MT5OrderTemplate:
             "price": None,
             "type": mt5.ORDER_TYPE_BUY if self.order_side == OrderSide.SELL else mt5.ORDER_TYPE_SELL,
             "type_time": mt5.ORDER_TIME_GTC,
-            "type_filling": mt5.ORDER_FILLING_IOC,
+            "type_filling": self.filling_mode,
         }
         return params
 
@@ -69,7 +70,17 @@ class MT5OMS:
 
         trade = Trade(order, volume)
         bot_logger.info("   [*] create trade, trade_id: {}".format(trade.trade_id))
-        order_tpl = MT5OrderTemplate(order["symbol"], volume, order.entry, order.tp, order.sl, order.side, order.type)
+        filling_mode = self.mt5_api.get_filling_mode(order["symbol"])
+        order_tpl = MT5OrderTemplate(
+            order["symbol"],
+            volume,
+            order.entry,
+            order.tp,
+            order.sl,
+            order.side,
+            order.type,
+            filling_mode,
+        )
         trade.main_order_params = order_tpl.get_main_order()
         trade.close_order_params = order_tpl.get_close_order()
         # update ask/bid price for market order

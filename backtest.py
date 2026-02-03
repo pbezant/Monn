@@ -24,6 +24,16 @@ class BackTest:
     def load_mt5_klines_monthly_data(self, symbol, interval, month, year):
         csv_data_path = os.path.join(self.data_dir, "{}-{}-{}-{:02d}.csv".format(symbol, interval, year, month))
         df = pd.read_csv(csv_data_path)
+        # Handle both column naming conventions
+        if "time" in df.columns and "Open time" not in df.columns:
+            df.rename(columns={
+                "time": "Open time",
+                "open": "Open",
+                "high": "High",
+                "low": "Low",
+                "close": "Close",
+                "tick_volume": "Volume"
+            }, inplace=True)
         df["Open time"] = pd.to_datetime(df["Open time"])
         return df
 

@@ -2,7 +2,7 @@ import time
 import logging
 from datetime import datetime, timedelta
 import pandas as pd
-import MetaTrader5 as mt5
+import MetaTrader5 as mt5  # type: ignore  # Windows-only module, runs on VM
 
 bot_logger = logging.getLogger("bot_logger")
 
@@ -44,10 +44,20 @@ class MT5API:
     def tick_bid_price(self, symbol):
         return mt5.symbol_info_tick(symbol).bid
 
+    def get_filling_mode(self, symbol):
+        symbol_info = mt5.symbol_info(symbol)
+        if symbol_info is None:
+            return mt5.ORDER_FILLING_RETURN
+        # Force RETURN to avoid broker rejects (10030) seen with IOC/FOK
+        return mt5.ORDER_FILLING_RETURN
+
     def klines(self, symbol: str, interval: str, **kwargs):
         symbol_rates = mt5.copy_rates_from_pos(
             symbol, getattr(mt5, "TIMEFRAME_" + (interval[-1:] + interval[:-1]).upper()), 0, kwargs["limit"]
         )
+        if symbol_rates is None or len(symbol_rates) == 0:
+            bot_logger.error(f"Failed to fetch klines for {symbol} {interval}: {mt5.last_error()}")
+            return pd.DataFrame()
         df = pd.DataFrame(symbol_rates)
         df["time"] += -time.timezone
         df["time"] = pd.to_datetime(df["time"], unit="s")

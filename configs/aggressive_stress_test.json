@@ -1,0 +1,146 @@
+[
+    {
+        "symbol": "EURUSD",
+        "strategies": [
+            {
+                "name": "break_strategy",
+                "params": {
+                    "min_num_cuml": 1,
+                    "min_zz_pct": 0.01,
+                    "zz_dev": 1.0,
+                    "ma_vol": 5,
+                    "vol_ratio_ma": 1.01,
+                    "kline_body_ratio": 1.0,
+                    "sl_fix_mode": "ADJ_SL"
+                },
+                "tfs": {
+                    "tf": "1m"
+                },
+                "max_sl_pct": 2.0,
+                "volume": 0.1
+            }
+        ],
+        "months": [1],
+        "year": 2026
+    },
+    {
+        "symbol": "GBPUSD",
+        "strategies": [
+            {
+                "name": "break_strategy",
+                "params": {
+                    "min_num_cuml": 1,
+                    "min_zz_pct": 0.01,
+                    "zz_dev": 1.0,
+                    "ma_vol": 5,
+                    "vol_ratio_ma": 1.01,
+                    "kline_body_ratio": 1.0,
+                    "sl_fix_mode": "ADJ_SL"
+                },
+                "tfs": {
+                    "tf": "1m"
+                },
+                "max_sl_pct": 2.0,
+                "volume": 0.1
+            }
+        ],
+        "months": [1],
+        "year": 2026
+    },
+    {
+        "symbol": "GBPJPY",
+        "strategies": [
+            {
+                "name": "break_strategy",
+                "params": {
+                    "min_num_cuml": 1,
+                    "min_zz_pct": 0.01,
+                    "zz_dev": 1.0,
+                    "ma_vol": 5,
+                    "vol_ratio_ma": 1.01,
+                    "kline_body_ratio": 1.0,
+                    "sl_fix_mode": "ADJ_SL"
+                },
+                "tfs": {
+                    "tf": "1m"
+                },
+                "max_sl_pct": 2.0,
+                "volume": 0.1
+            }
+        ],
+        "months": [1],
+        "year": 2026
+    },
+    {
+        "symbol": "USDJPY",
+        "strategies": [
+            {
+                "name": "break_strategy",
+                "params": {
+                    "min_num_cuml": 1,
+                    "min_zz_pct": 0.01,
+                    "zz_dev": 1.0,
+                    "ma_vol": 5,
+                    "vol_ratio_ma": 1.01,
+                    "kline_body_ratio": 1.0,
+                    "sl_fix_mode": "ADJ_SL"
+                },
+                "tfs": {
+                    "tf": "1m"
+                },
+                "max_sl_pct": 2.0,
+                "volume": 0.1
+            }
+        ],
+        "months": [1],
+        "year": 2026
+    },
+    {
+        "symbol": "AUDUSD",
+        "strategies": [
+            {
+                "name": "break_strategy",
+                "params": {
+                    "min_num_cuml": 1,
+                    "min_zz_pct": 0.01,
+                    "zz_dev": 1.0,
+                    "ma_vol": 5,
+                    "vol_ratio_ma": 1.01,
+                    "kline_body_ratio": 1.0,
+                    "sl_fix_mode": "ADJ_SL"
+                },
+                "tfs": {
+                    "tf": "1m"
+                },
+                "max_sl_pct": 2.0,
+                "volume": 0.1
+            }
+        ],
+        "months": [1],
+        "year": 2026
+    },
+    {
+        "symbol": "EURJPY",
+        "strategies": [
+            {
+                "name": "break_strategy",
+                "params": {
+                    "min_num_cuml": 1,
+                    "min_zz_pct": 0.01,
+                    "zz_dev": 1.0,
+                    "ma_vol": 5,
+                    "vol_ratio_ma": 1.01,
+                    "kline_body_ratio": 1.0,
+                    "sl_fix_mode": "ADJ_SL"
+                },
+                "tfs": {
+                    "tf": "1m"
+                },
+                "max_sl_pct": 2.0,
+                "volume": 0.1
+            }
+        ],
+        "months": [1],
+        "year": 2026
+    }
+]

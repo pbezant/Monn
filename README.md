@@ -10,6 +10,7 @@ This repository contains a trading bot that utilizes the MetaTrader5 API for aut
   - [Proxmox VM Deployment](#proxmox-vm-deployment)
 - [Configuration](#configuration)
 - [Usage](#usage)
+- [Operations & Monitoring](#operations--monitoring)
 - [Disclaimer](#disclaimer)
 
 ## Features
@@ -145,6 +146,49 @@ For detailed deployment architecture and agent information, see [DEPLOYMENT_AGEN
   4. For tuning a strategy's parameters, use the following command:
      ```bash
      python tuning.py --sym_cfg_file <tuning_configs/break_strategy_tuning_config.json> --data_dir <path to historical candle data>
+
+## Operations & Monitoring
+
+Once your bot is deployed and running, use these resources for ongoing management:
+
+### 📊 Monitoring the Bot
+
+**Quick Status Check** (from your Mac):
+```bash
+./monitor_bot.sh
+```
+
+**Detailed Account Analysis**:
+```bash
+ssh metatrader@192.168.1.201 "cd Developement\Monn && C:\Python311\python.exe get_account_status.py"
+```
+
+**Watch Live Logs**:
+```bash
+ssh metatrader@192.168.1.201 "cd Developement\Monn\logs\mt5 && powershell Get-Content (ls bot_2026*.log | sort LastWriteTime -Desc | select -First 1).FullName -Wait -Tail 20"
+```
+
+For complete monitoring instructions, see **[MONITORING.md](MONITORING.md)**
+
+### 🤖 AI Agent System
+
+The bot includes an AI agent architecture for automated management:
+
+- **Server Management Agent** - VM health, deployments, dependencies
+- **Start/Stop Control Agent** - Bot lifecycle management
+- **Research Agent** - Error investigation, backtesting, optimization
+- **Monitoring Agent** - Real-time tracking, alerts, metrics
+- **Configuration Management Agent** - Config validation, versioning, rollback
+- **Communication Agent** - Status reports, alerts, user interaction
+- **Data Management Agent** - Log rotation, trade history, archival
+
+Each agent has detailed workflows for common tasks. See **[AGENTS.md](AGENTS.md)** for complete documentation.
+
+### 📚 Additional Documentation
+
+- **[DEPLOYMENT_AGENTS.md](DEPLOYMENT_AGENTS.md)** - Infrastructure deployment and architecture
+- **[MONITORING.md](MONITORING.md)** - Complete monitoring guide with commands and troubleshooting
+- **[AGENTS.md](AGENTS.md)** - AI agent workflows for bot management and operations
 
 ## Disclaimer
   Trading in financial markets involves risks, and the trading bot provided in this project is for educational and informational purposes only. The use of this bot is at your own risk, and the developers cannot be held responsible for any financial losses incurred.
