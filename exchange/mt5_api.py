@@ -47,9 +47,32 @@ class MT5API:
     def get_filling_mode(self, symbol):
         symbol_info = mt5.symbol_info(symbol)
         if symbol_info is None:
+            bot_logger.warning(f"Symbol info not available for {symbol}, defaulting to RETURN")
             return mt5.ORDER_FILLING_RETURN
-        # Force RETURN to avoid broker rejects (10030) seen with IOC/FOK
-        return mt5.ORDER_FILLING_RETURN
+        
+        # Get the supported filling modes for this symbol
+        filling_mode = symbol_info.filling_mode
+        bot_logger.info(f"{symbol} filling_mode raw value: {filling_mode} (binary: {bin(filling_mode)})")
+        
+        # Check which filling modes are supported (bitwise flags)
+        # Bit 0 (value 1): FOK (Fill or Kill)
+        # Bit 1 (value 2): IOC (Immediate or Cancel)
+        # Bit 2 (value 4): RETURN
+        # Priority: RETURN > FOK > IOC (RETURN is most compatible across brokers)
+        
+        if filling_mode & 4:  # ORDER_FILLING_RETURN supported (bit 2)
+            bot_logger.info(f"{symbol} using RETURN filling mode (most compatible)")
+            return mt5.ORDER_FILLING_RETURN
+        elif filling_mode & 1:  # ORDER_FILLING_FOK supported (bit 0)
+            bot_logger.info(f"{symbol} using FOK filling mode")
+            return mt5.ORDER_FILLING_FOK
+        elif filling_mode & 2:  # ORDER_FILLING_IOC supported (bit 1)
+            bot_logger.info(f"{symbol} using IOC filling mode")
+            return mt5.ORDER_FILLING_IOC
+        else:
+            # Fallback - should never happen
+            bot_logger.warning(f"{symbol} No standard filling mode detected, defaulting to RETURN")
+            return mt5.ORDER_FILLING_RETURN
 
     def klines(self, symbol: str, interval: str, **kwargs):
         symbol_rates = mt5.copy_rates_from_pos(
